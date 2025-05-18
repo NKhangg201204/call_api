@@ -12,16 +12,24 @@
         <input v-model="user.username" type="text" placeholder="Nhập tên đăng nhập" class="form-input" />
       </div>
 
-      <div class="form-group">
+      <div class="form-group relative">
         <label class="form-label">
           <i class="fas fa-lock mr-2 text-purple-500"></i> Mật khẩu
         </label>
-        <input v-model="user.password" type="password" placeholder="Nhập mật khẩu" class="form-input" />
+        <input v-model="user.password" :type="showPassword ? 'text' : 'password'" placeholder="Nhập mật khẩu"
+          class="form-input pr-10" />
+        <span class="password-toggle" @click="showPassword = !showPassword"
+          :title="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
+          <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+        </span>
       </div>
 
-      <p v-if="log" class="error-msg">
-        <i class="fas fa-exclamation-circle mr-1"></i>{{ log }}
+      <p v-if="log" :class="isSuccess ? 'success-msg' : 'error-msg'">
+        <i :class="isSuccess ? 'fas fa-check-circle mr-1' : 'fas fa-exclamation-circle mr-1'"></i>
+        {{ log }}
       </p>
+
+
 
       <button type="submit" class="btn-submit">
         <i class="fas fa-arrow-right-to-bracket mr-2"></i> Đăng nhập
@@ -39,8 +47,11 @@ import VueJwtDecode from 'vue-jwt-decode';
 import apiResource from '../composables/apiResource';
 import { useRouter } from 'vue-router';
 
+
+const showPassword = ref(false);
 const { auth_login } = apiResource();
 const router = useRouter();
+const isSuccess = ref(false);
 
 const goBack = () => router.back();
 
@@ -58,17 +69,65 @@ const handleLogin = async () => {
       localStorage.setItem('access_token', response.access_token);
       const decodedToken = VueJwtDecode.decode(response.access_token);
       log.value = `Xin chào, ${decodedToken.email || 'người dùng'}!`;
+      isSuccess.value = true;
     } else {
       log.value = 'Thông tin đăng nhập không đúng.';
+      isSuccess.value = false;
     }
   } catch (error) {
     console.error('Login failed', error);
     log.value = 'Đăng nhập thất bại. Vui lòng thử lại.';
+    isSuccess.value = false;
   }
 };
 </script>
 
 <style scoped>
+.success-msg {
+  color: #16a34a;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-align: center;
+  margin-top: 0.25rem;
+  animation: pulseGreen 1.5s infinite;
+}
+
+@keyframes pulseGreen {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.form-group.relative {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 3rem;
+  right: 1rem;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.1rem;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: #9333ea;
+}
+
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -97,17 +156,17 @@ const handleLogin = async () => {
 .back-button {
   display: inline-flex;
   align-items: center;
-  color: #ffffff; 
-  background: linear-gradient(90deg, #a855f7, #ec4899); 
+  color: #ffffff;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-weight: 700;
-  font-size: 1.25rem; 
+  font-size: 1.25rem;
   cursor: pointer;
   user-select: none;
   transition: all 0.3s ease;
   margin-top: 1.5rem;
   padding: 0.5rem 1.25rem;
-  border-radius: 9999px; 
+  border-radius: 9999px;
   box-shadow: 0 6px 12px rgba(168, 85, 247, 0.5);
 }
 
