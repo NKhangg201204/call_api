@@ -28,16 +28,13 @@ import { reactive, ref } from 'vue';
 import VueJwtDecode from 'vue-jwt-decode';
 import apiResource from '../composables/apiResource';
 
-// API từ composable
 const { auth_login } = apiResource();
 
-// Khai báo dữ liệu người dùng
 const user = reactive({
   username: '',
   password: '',
 });
 
-// Thông báo phản hồi
 const log = ref('');
 
 const handleLogin = async () => {
@@ -47,11 +44,8 @@ const handleLogin = async () => {
     if (response.access_token) {
       localStorage.setItem('access_token', response.access_token);
 
-      const token = localStorage.getItem('access_token');
-      const decodedToken = VueJwtDecode.decode(token);
-
-      // Hiển thị payload từ JWT
-      log.value = `Xin chào, ${decodedToken.username || 'người dùng'}!`;
+      const decodedToken = VueJwtDecode.decode(response.access_token);
+      log.value = `Xin chào, ${decodedToken.email || 'người dùng'}!`;
     } else {
       log.value = 'Thông tin đăng nhập không đúng.';
     }
@@ -61,6 +55,7 @@ const handleLogin = async () => {
   }
 };
 </script>
+
 
 
 <style scoped>
