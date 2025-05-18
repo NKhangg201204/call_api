@@ -1,4 +1,3 @@
-// usePageRequests.js
 export default function usePageRequests() {
   const makePostRequest = async (url, body, headers = {}) => {
     const accessToken = localStorage.getItem("jwt_token");
